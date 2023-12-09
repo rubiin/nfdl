@@ -13,7 +13,7 @@
   },
   "bugs": "https://github.com/rubiin/nfdl/issues",
   "bin": {
-    "taze": "bin/nfdl.mjs"
+    "nfdl": "bin/nfdl.mjs"
   },
   "files": [
     "dist"
