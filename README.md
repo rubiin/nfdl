@@ -34,7 +34,16 @@ Install NFDL globally using npm:
 
 ```bash
 npm install -g nfdl
+
 ```
+### Usage
+
+Run the cli:
+```bash
+nfdl
+
+```
+Select your desired Nerd Fonts from the menu and let the cli handle the rest. The fonts will be downloaded and installed in the `.fonts` directory in your home directory.
 
 ## Contributing
 

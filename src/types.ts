@@ -1,7 +1,4 @@
-export interface Fonts {
-  name: string
-  value: string
-}
+
 
 export interface AssetType {
   url: string
@@ -15,4 +12,12 @@ export interface AssetType {
   updated_at: string
   browser_download_url: string
 
+}
+
+
+export interface ICache {
+  ttl?: number;
+  data?: {
+    name: string
+  }[]
 }

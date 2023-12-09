@@ -6,7 +6,11 @@ export default defineBuildConfig({
   ],
   rollup: {
     inlineDependencies: true,
+    esbuild: {
+      minify: true
+    }
   },
+
   clean: true,
-  declaration: true,
+  declaration: false,
 })
