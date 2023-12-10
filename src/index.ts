@@ -5,10 +5,9 @@ import { pipeline as streamPipeline } from "node:stream";
 import { promisify } from "node:util";
 import enquirer from "enquirer";
 import unzipper from "unzipper";
-import got from "got";
 import cliProgress from "cli-progress";
 import { BASE_NERD_FONTS_DOWNLOAD_URL, DOWNLOAD_DIR } from "./constant";
-import { client, getAvailableFonts } from "./util";
+import { IsNetworkAvailable, client, getAvailableFonts } from "./util";
 
 const pipeline = promisify(streamPipeline);
 
@@ -16,8 +15,7 @@ const pipeline = promisify(streamPipeline);
 async function selectFonts(): Promise<string[]> {
   const availableFonts = await getAvailableFonts();
   const options = availableFonts.map(font => ({
-    name: font.name,
-    value: font.value,
+    name: font.name
   }));
 
   const response = await enquirer.prompt<{ fonts: string[] }>({
@@ -25,6 +23,7 @@ async function selectFonts(): Promise<string[]> {
     name: "fonts",
     message: "Select the fonts to download and extract",
     choices: options,
+    sort: true,
     multiple: true,
     // @ts-expect-error - The `limit` property is not defined in the typings
     limit: 10,
@@ -41,13 +40,16 @@ async function downloadAndExtractFonts(selectedFonts: string[]): Promise<void> {
 
     try {
       const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+
+      // Start the progress bar with an initial value of 0
       progressBar.start(100, 0);
+
       // Download font with progress tracking
       const response = client.stream(downloadUrl)
         .on("downloadProgress", (progress: { percent: number }) => {
           // You can handle progress updates here if needed
-          const truncatedPercent = Math.floor(progress.percent * 100);
-          progressBar.update(truncatedPercent);
+          const adjustedPercent = Math.min(100, Math.max(0, progress.percent * 100)); // Adjust to fit within 0-100
+          progressBar.update(adjustedPercent);
         });
 
       // Save the downloaded font
@@ -63,16 +65,18 @@ async function downloadAndExtractFonts(selectedFonts: string[]): Promise<void> {
       await fs.promises.unlink(downloadPath);
     }
     catch (error) {
-      if(error instanceof Error)
-      console.error(`❌ Failed to download and extract font '${font}':`, error.message);
+      if (error instanceof Error)
+        console.error(`❌ Failed to download and extract font '${font}':`, error.message);
     }
   }
 
   console.info(`✅ Fonts successfully downloaded and extracted to ${DOWNLOAD_DIR}`);
+  process.exit(0);
 }
 
 // Main function
 export async function main(): Promise<void> {
+  await IsNetworkAvailable();
   const selectedFonts = await selectFonts();
 
   if (selectedFonts.length === 0) {

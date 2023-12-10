@@ -1,7 +1,4 @@
-export interface Fonts {
-  name: string
-  value: string
-}
+
 
 export interface AssetType {
   url: string
