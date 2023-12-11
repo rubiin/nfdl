@@ -114,7 +114,12 @@ export async function downloadAndExtractFonts(selectedFonts: string[]) {
     const downloadPath = path.join(DOWNLOAD_DIR, fontFile);
 
     try {
-      const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+      const progressBar = new cliProgress.SingleBar({
+        format: `Downloading and extracting ${font} [{bar}] {percentage}% | ETA: {eta}s | {value}/{total}`,
+        barCompleteChar: "\u2588",
+        barIncompleteChar: "\u2591",
+        hideCursor: true,
+      }, cliProgress.Presets.shades_classic);
 
       // Start the progress bar with an initial value of 0
       progressBar.start(100, 0);
