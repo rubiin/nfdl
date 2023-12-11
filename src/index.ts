@@ -13,6 +13,7 @@ export async function main(){
     console.info("❌ No fonts selected. Exiting...");
   }
   else {
+
     // Ensure the download directory exists
     if (!fs.existsSync(DOWNLOAD_DIR))
       fs.mkdirSync(DOWNLOAD_DIR);

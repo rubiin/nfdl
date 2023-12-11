@@ -14,6 +14,9 @@ dependencies:
   got:
     specifier: ^14.0.0
     version: 14.0.0
+  helper-fns:
+    specifier: ^2.6.43
+    version: 2.6.43
   is-online:
     specifier: ^10.0.0
     version: 10.0.0
@@ -3307,6 +3310,10 @@ packages:
     dependencies:
       function-bind: 1.1.2
     dev: true
+
+  /helper-fns@2.6.43:
+    resolution: {integrity: sha512-EpWRDFanNmDwM49ND75k0Ejt0bIfxgh055PNl5kkc1tbC+tPceL56WDY/6HVtJx1r+/iBV3qKmXfA0aBWJTc1Q==}
+    dev: false
 
   /hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}

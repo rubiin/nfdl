@@ -8,9 +8,9 @@ import isOnline from "is-online";
 import enquirer from "enquirer";
 import unzipper from "unzipper";
 import cliProgress from "cli-progress";
-import { BASE_NERD_FONTS_DOWNLOAD_URL, BASE_NERD_FONTS_URL, DOWNLOAD_DIR, chromeUserAgent } from "./constant";
-import type { AssetType } from "./types";
-
+import { isObject } from "helper-fns";
+import { BASE_NERD_FONTS_DOWNLOAD_URL, BASE_NERD_FONTS_URL, CACHE_TTL, DOWNLOAD_DIR, FONT_CACHE_FILE, chromeUserAgent } from "./constant";
+import type { AssetType, ICache } from "./types";
 
 const pipeline = promisify(streamPipeline);
 
@@ -20,21 +20,6 @@ export const client = got.extend({
   },
 });
 
-/**
- * The function converts a given number of bytes into a human-readable string representation with
- * appropriate units (Bytes, KB, MB).
- * @param {number} bytes - The `bytes` parameter in the `bytesToSize` function represents the number of
- * bytes that you want to convert to a human-readable size.
- * @returns a string representation of the given number of bytes in a human-readable format. The format
- * includes the size in kilobytes (KB) or megabytes (MB) depending on the magnitude of the input.
- */
-export function bytesToSize(bytes: number) {
-  const sizes = ["Bytes", "KB", "MB"];
-  if (bytes === 0)
-    return "0 Byte";
-  const index = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${Math.round(bytes / 1024 ** index)} ${sizes[index]}`;
-}
 
 /**
  * The function checks if there is an internet connection available and logs an error message if not.
@@ -53,19 +38,37 @@ export async function IsNetworkAvailable() {
  * @returns The function `getAvailableFonts` returns an array of objects. Each object in the array
  * represents an available font and has a `name` property.
  */
-export async function getAvailableFonts() {
+
+// Function to fetch available fonts with caching
+export async function getAvailableFonts(): Promise<{ name: string }[]> {
   try {
-    const { body } = await client.get<{
-      assets: AssetType[]
-    }>(BASE_NERD_FONTS_URL, {
+    let fontCache = await readFontCache();
+
+    if (isObject(fontCache) && Object.keys(fontCache).length !== 0 && fontCache.data && !isCacheEntryExpired(fontCache.ttl!)) {
+      console.info("Using cached available fonts");
+      return fontCache.data;
+    }
+
+    const { body } = await client.get<{ assets: AssetType[] }>(BASE_NERD_FONTS_URL, {
       responseType: "json",
     });
 
-    return body.assets.filter(element => !element.name.includes("tar.xz")).map((asset: AssetType) => {
-      return {
-        name: asset.name.replace("nerd-fonts-", "").replace(".zip", ""),
-      };
-    });
+    const availableFonts = body.assets
+      .filter(element => !element.name.includes("tar.xz"))
+      .map((asset: AssetType) => {
+        return {
+          name: asset.name.replace("nerd-fonts-", "").replace(".zip", ""),
+        };
+      });
+
+    // Update the font cache with timestamp and data
+    fontCache = {
+      ttl: Date.now(),
+      data: availableFonts,
+    };
+    await writeFontCache(fontCache);
+
+    return availableFonts;
   }
   catch (error) {
     if (error instanceof Error)
@@ -144,4 +147,26 @@ export async function downloadAndExtractFonts(selectedFonts: string[]) {
 
   console.info(`✅ Fonts successfully downloaded and extracted to ${DOWNLOAD_DIR}`);
   process.exit(0);
+}
+
+// Function to read the font cache from a file
+export async function readFontCache(): Promise<ICache> {
+  try {
+    const data = await fs.promises.readFile(FONT_CACHE_FILE, "utf8");
+    return JSON.parse(data) as ICache;
+  }
+  catch (error) {
+    return {};
+  }
+}
+
+// Function to write the font cache to a file
+export function writeFontCache(cache: ICache) {
+  return fs.promises.writeFile(FONT_CACHE_FILE, JSON.stringify(cache), "utf8");
+}
+
+// Function to check if a cache entry has expired
+export function isCacheEntryExpired(timestamp: number): boolean {
+  const currentTime = Date.now();
+  return currentTime - timestamp > CACHE_TTL;
 }

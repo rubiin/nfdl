@@ -13,3 +13,11 @@ export interface AssetType {
   browser_download_url: string
 
 }
+
+
+export interface ICache {
+  ttl?: number;
+  data?: {
+    name: string
+  }[]
+}
