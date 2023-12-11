@@ -1,14 +1,15 @@
-import process from "node:process";
+import { exec } from "node:child_process";
+import fs from "node:fs";
 import path from "node:path";
+import process from "node:process";
 import { pipeline as streamPipeline } from "node:stream";
 import { promisify } from "node:util";
-import fs from "node:fs";
-import got from "got";
 import isOnline from "is-online";
-import enquirer from "enquirer";
-import unzipper from "unzipper";
-import cliProgress from "cli-progress";
 import { isObject } from "helper-fns";
+import got from "got";
+import enquirer from "enquirer";
+import cliProgress from "cli-progress";
+import unzipper from "unzipper";
 import { BASE_NERD_FONTS_DOWNLOAD_URL, BASE_NERD_FONTS_URL, CACHE_TTL, DOWNLOAD_DIR, FONT_CACHE_FILE, chromeUserAgent } from "./constant";
 import type { AssetType, ICache } from "./types";
 
@@ -20,6 +21,22 @@ export const client = got.extend({
   },
 });
 
+/**
+ * The function executes a command and logs any errors or stderr output.
+ * @param {string} command - The `command` parameter is a string that represents the command you want
+ * to execute. It can be any valid command that can be executed in a command-line interface, such as
+ * running a script, executing a program, or running a shell command.
+ */
+export function executeCommand(command: string) {
+  return exec(command, (error, stderr) => {
+    if (error) {
+      console.error(`error: ${error.message}`);
+      return;
+    }
+    if (stderr)
+      console.error(`stderr: ${stderr}`);
+  });
+}
 
 /**
  * The function checks if there is an internet connection available and logs an error message if not.
