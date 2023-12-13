@@ -43,7 +43,7 @@ Run the cli:
 nfdl
 
 ```
-Select your desired Nerd Fonts from the menu and let the cli handle the rest. The fonts will be downloaded and installed in the `.fonts` directory in your home directory.
+Select your desired Nerd Fonts from the menu and let the cli handle the rest. By default, fonts will be downloaded and installed in the `.fonts` directory in your home directory.
 
 ## Contributing
 
