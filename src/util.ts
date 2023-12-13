@@ -156,11 +156,12 @@ export async function downloadAndExtractFonts(selectedFonts: string[], allArgume
 
       // Download font with progress tracking
       const response = client.stream(downloadUrl)
-        .on("downloadProgress", (progress: { percent: number }) => {
+        .on("downloadProgress", ({ percent,transferred }: {percent: number, transferred: number}) => {
           // You can handle progress updates here if needed
-          const adjustedPercent = Math.min(100, Math.max(0, progress.percent * 100)); // Adjust to fit within 0-100
+          const adjustedPercent = Math.min(100, Math.max(0, percent * 100)); // Adjust to fit within 0-100
           progressBar.update(adjustedPercent);
-        });
+        })
+
 
       // Save the downloaded font
       await pipeline(response, fs.createWriteStream(downloadPath));
