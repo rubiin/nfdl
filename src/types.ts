@@ -1,4 +1,9 @@
-
+export interface Options{
+  otf?: boolean;
+  ttf?: boolean;
+  quiet?: boolean;
+  dir?: string;
+}
 
 export interface AssetType {
   url: string

@@ -2,6 +2,7 @@ import { exec } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
+import os from "node:os";
 import { pipeline as streamPipeline } from "node:stream";
 import { promisify } from "node:util";
 import isOnline from "is-online";
@@ -11,7 +12,7 @@ import enquirer from "enquirer";
 import cliProgress from "cli-progress";
 import unzipper from "unzipper";
 import { BASE_NERD_FONTS_DOWNLOAD_URL, BASE_NERD_FONTS_URL, CACHE_TTL, DOWNLOAD_DIR, FONT_CACHE_FILE, chromeUserAgent } from "./constant";
-import type { AssetType, ICache } from "./types";
+import type { AssetType, ICache, Options } from "./types";
 
 const pipeline = promisify(streamPipeline);
 
@@ -20,6 +21,17 @@ export const client = got.extend({
     "User-Agent": chromeUserAgent,
   },
 });
+
+/**
+ * The function returns the download directory based on the provided options.
+ * @param {Options} allArguments - An object containing all the arguments passed to the function.
+ * @returns the download directory. If the `dir` property is present in the `allArguments` object, it
+ * will return the path joined with the user's home directory and the `dir` value. Otherwise, it will
+ * return the `DOWNLOAD_DIR` constant.
+ */
+export function getDownloadDirectory(allArguments: Options) {
+  return allArguments.dir ? `${path.join(os.homedir(), allArguments.dir)}` : DOWNLOAD_DIR;
+}
 
 /**
  * The function executes a command and logs any errors or stderr output.
@@ -124,11 +136,12 @@ export async function selectFonts() {
  * @param {string[]} selectedFonts - An array of font names that have been selected for download and
  * extraction.
  */
-export async function downloadAndExtractFonts(selectedFonts: string[]) {
+export async function downloadAndExtractFonts(selectedFonts: string[], allArguments: Options) {
+  const downloadDirectory = getDownloadDirectory(allArguments);
   for (const font of selectedFonts) {
     const fontFile = `${font}.zip`;
     const downloadUrl = `${BASE_NERD_FONTS_DOWNLOAD_URL}/${fontFile}`;
-    const downloadPath = path.join(DOWNLOAD_DIR, fontFile);
+    const downloadPath = path.join(downloadDirectory, fontFile);
 
     try {
       const progressBar = new cliProgress.SingleBar({
@@ -156,7 +169,7 @@ export async function downloadAndExtractFonts(selectedFonts: string[]) {
       progressBar.stop();
 
       // Extract font
-      await pipeline(fs.createReadStream(downloadPath), unzipper.Extract({ path: DOWNLOAD_DIR }));
+      await pipeline(fs.createReadStream(downloadPath), unzipper.Extract({ path: downloadDirectory }));
 
       // Remove the downloaded zip file
       await fs.promises.unlink(downloadPath);
@@ -167,7 +180,7 @@ export async function downloadAndExtractFonts(selectedFonts: string[]) {
     }
   }
 
-  console.info(`✅ Fonts successfully downloaded and extracted to ${DOWNLOAD_DIR}`);
+  !allArguments?.quiet && console.info(`✅ Fonts successfully downloaded and extracted to ${downloadDirectory}`);
   process.exit(0);
 }
 
