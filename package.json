@@ -1,7 +1,7 @@
 {
   "name": "nfdl",
   "type": "module",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "packageManager": "pnpm@8.12.0",
   "description": "NFDL is a handy CLI tool that simplifies the process of downloading and installing popular Nerd Fonts. Nerd Fonts are a collection of over 50 patched fonts with additional icons and glyphs, designed for developers and terminal enthusiasts.",
   "author": "Rubin Bhandari <roobin.bhandari@gmail.com>",
