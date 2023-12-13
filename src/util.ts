@@ -149,6 +149,7 @@ export async function downloadAndExtractFonts(selectedFonts: string[], allArgume
         barCompleteChar: "\u2588",
         barIncompleteChar: "\u2591",
         hideCursor: true,
+        formatValue: (value: number) => `${Math.round(value)}`,
       }, cliProgress.Presets.shades_classic);
 
       // Start the progress bar with an initial value of 0
@@ -156,7 +157,7 @@ export async function downloadAndExtractFonts(selectedFonts: string[], allArgume
 
       // Download font with progress tracking
       const response = client.stream(downloadUrl)
-        .on("downloadProgress", ({ percent,transferred }: {percent: number, transferred: number}) => {
+        .on("downloadProgress", ({ percent }: {percent: number}) => {
           // You can handle progress updates here if needed
           const adjustedPercent = Math.min(100, Math.max(0, percent * 100)); // Adjust to fit within 0-100
           progressBar.update(adjustedPercent);
