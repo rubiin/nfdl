@@ -1,12 +1,16 @@
 import fs from "node:fs";
 import process from "node:process";
 import os from "node:os";
-import path from "node:path";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 import packageJson from "../package.json";
-import { DOWNLOAD_DIR } from "./constant";
-import { IsNetworkAvailable, downloadAndExtractFonts, executeCommand, getDownloadDirectory, selectFonts } from "./util";
+import {
+  IsNetworkAvailable,
+  downloadAndExtractFonts,
+  executeCommand,
+  getDownloadDirectory,
+  selectFonts,
+} from "./util";
 import type { Options } from "./types";
 
 process.stdin.on("keypress", (_char, key: { ctrl: boolean, name: string }) => {
@@ -41,6 +45,12 @@ const allArguments = yargs(hideBin(process.argv))
     },
     ttf: {
       description: "Prefer TTF font files",
+      requiresArg: false,
+      required: false,
+      boolean: true,
+    },
+    extract: {
+      description: "Automatically extract downloaded fonts",
       requiresArg: false,
       required: false,
       boolean: true,

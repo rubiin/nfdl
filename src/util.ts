@@ -138,6 +138,8 @@ export async function selectFonts() {
  */
 export async function downloadAndExtractFonts(selectedFonts: string[], allArguments: Options) {
   const downloadDirectory = getDownloadDirectory(allArguments);
+
+  // TODO: Do this parallelly
   for (const font of selectedFonts) {
     const fontFile = `${font}.zip`;
     const downloadUrl = `${BASE_NERD_FONTS_DOWNLOAD_URL}/${fontFile}`;
@@ -157,12 +159,11 @@ export async function downloadAndExtractFonts(selectedFonts: string[], allArgume
 
       // Download font with progress tracking
       const response = client.stream(downloadUrl)
-        .on("downloadProgress", ({ percent }: {percent: number}) => {
+        .on("downloadProgress", ({ percent }: { percent: number }) => {
           // You can handle progress updates here if needed
           const adjustedPercent = Math.min(100, Math.max(0, percent * 100)); // Adjust to fit within 0-100
           progressBar.update(adjustedPercent);
-        })
-
+        });
 
       // Save the downloaded font
       await pipeline(response, fs.createWriteStream(downloadPath));
@@ -170,11 +171,13 @@ export async function downloadAndExtractFonts(selectedFonts: string[], allArgume
       // Stop the progress bar
       progressBar.stop();
 
-      // Extract font
-      await pipeline(fs.createReadStream(downloadPath), unzipper.Extract({ path: downloadDirectory }));
+      if (allArguments?.extract) {
+        // Extract font
+        await pipeline(fs.createReadStream(downloadPath), unzipper.Extract({ path: downloadDirectory }));
 
-      // Remove the downloaded zip file
-      await fs.promises.unlink(downloadPath);
+        // Remove the downloaded zip file
+        await fs.promises.unlink(downloadPath);
+      }
     }
     catch (error) {
       if (error instanceof Error)

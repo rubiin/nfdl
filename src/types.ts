@@ -1,8 +1,9 @@
-export interface Options{
-  otf?: boolean;
-  ttf?: boolean;
-  quiet?: boolean;
-  dir?: string;
+export interface Options {
+  otf?: boolean
+  ttf?: boolean
+  quiet?: boolean
+  extract?: boolean
+  dir?: string
 }
 
 export interface AssetType {
@@ -16,12 +17,10 @@ export interface AssetType {
   created_at: string
   updated_at: string
   browser_download_url: string
-
 }
 
-
 export interface ICache {
-  ttl?: number;
+  ttl?: number
   data?: {
     name: string
   }[]
