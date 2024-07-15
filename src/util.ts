@@ -30,7 +30,7 @@ export const client = got.extend({
  * return the `DOWNLOAD_DIR` constant.
  */
 export function getDownloadDirectory(allArguments: Options) {
-  return allArguments.dir ? `${path.join(os.homedir(), allArguments.dir)}` : DOWNLOAD_DIR;
+  return ((allArguments?.dir) != null) ? `${path.join(os.homedir(), allArguments.dir)}` : DOWNLOAD_DIR;
 }
 
 /**
@@ -185,7 +185,7 @@ export async function downloadAndExtractFonts(selectedFonts: string[], allArgume
     }
   }
 
-  !allArguments?.quiet && console.info(`✅ Fonts successfully downloaded and extracted to ${downloadDirectory}`);
+  console.info(`✅ Fonts successfully downloaded and extracted to ${downloadDirectory}`);
   process.exit(0);
 }
 
@@ -196,12 +196,13 @@ export async function readFontCache(): Promise<ICache> {
     return JSON.parse(data) as ICache;
   }
   catch (error) {
+    console.info(error);
     return {};
   }
 }
 
 // Function to write the font cache to a file
-export function writeFontCache(cache: ICache) {
+export async function writeFontCache(cache: ICache) {
   return fs.promises.writeFile(FONT_CACHE_FILE, JSON.stringify(cache), "utf8");
 }
 

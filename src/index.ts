@@ -13,7 +13,7 @@ import {
 } from "./util";
 import type { Options } from "./types";
 
-process.stdin.on("keypress", (_char, key: { ctrl: boolean, name: string }) => {
+process.stdin.on("keypress", (_char, key: { ctrl: boolean; name: string }) => {
   if (key.ctrl && key.name === "c")
     process.exit(0);
 });
@@ -36,12 +36,6 @@ const allArguments = yargs(hideBin(process.argv))
       requiresArg: false,
       required: false,
       boolean: true,
-    },
-    quiet: {
-      description: "Suppresses all output except for errors",
-      requiresArg: false,
-      required: false,
-      boolean: false,
     },
     ttf: {
       description: "Prefer TTF font files",
