@@ -30,7 +30,7 @@ export const client = got.extend({
  * return the `DOWNLOAD_DIR` constant.
  */
 export function getDownloadDirectory(allArguments: Options) {
-  return ((allArguments?.dir) != null) ? `${path.join(os.homedir(), allArguments.dir)}` : DOWNLOAD_DIR;
+  return allArguments?.dir ? `${path.join(os.homedir(), allArguments.dir)}` : DOWNLOAD_DIR;
 }
 
 /**
