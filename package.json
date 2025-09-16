@@ -32,7 +32,7 @@
     "cli-progress": "^3.12.0",
     "enquirer": "^2.4.1",
     "got": "^14.4.8",
-    "helper-fns": "^2.9.2",
+    "helper-fns": "^2.9.3",
     "is-online": "^12.0.1",
     "unzipper": "^0.12.3",
     "yargs": "^17.7.2"
@@ -41,7 +41,7 @@
     "@types/cli-progress": "^3.11.6",
     "@types/inquirer": "^9.0.9",
     "@types/jest": "^29.5.14",
-    "@types/node": "^24.3.3",
+    "@types/node": "^24.5.0",
     "@types/unzipper": "^0.10.11",
     "@types/yargs": "^17.0.33",
     "bumpp": "^10.2.3",
